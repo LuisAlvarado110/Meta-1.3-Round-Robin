@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Round Robin</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .encabezado {
+            background: linear-gradient(135deg, #6c63ff, #8976ff);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .card-text {
+            white-space: pre-wrap;
+            text-align: left;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <div class="encabezado">
+        <h1 class="display-4">Simulación Round Robin</h1>
+    </div>
+
+    <div id="cards-container" class="container my-4">
+        <div class="row g-4" id="cards-row"></div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let lineasDeCodigo = [
+            'a = 1 + 2;',
+            'console.log("1 + 2");',
+            'b = 3 + 4;',
+            'console.log("3 + 4");',
+            'c = 5 + 6;',
+            'console.log("5 + 6");',
+            'd = 7 + 8;',
+            'console.log("7 + 8");',
+            'console.log(a);',
+            'console.log(b);',
+            'console.log(c);',
+            'console.log(d);',
+        ];
+
+        function getRandom() {
+            return lineasDeCodigo[Math.floor(Math.random() * lineasDeCodigo.length)];
+        }
+
+        function crearProceso(id) {
+            return {
+                id: id,
+                codigo: [
+                    getRandom(),
+                    getRandom(),
+                    getRandom(),
+                ],
+                lineaActual: 0,
+            };
+        }
+
+        function ejecutarProceso(proceso) {
+            if (proceso.lineaActual < proceso.codigo.length) {
+                return `Línea de código: ${proceso.codigo[proceso.lineaActual++]}`;
+            } else {
+                return null;
+            }
+        }
+
+        function inicioProcesos(numProcesos) {
+            let procesos = [];
+            for (let i = 1; i <= numProcesos; i++) {
+                procesos.push(crearProceso(i));
+            }
+            return procesos;
+        }
+
+        let numProcesos = prompt("Número de procesos a realizar", 3);
+        numProcesos = parseInt(numProcesos);
+
+        let procesos = inicioProcesos(numProcesos);
+        let terminar = false;
+        let cardsRow = document.getElementById('cards-row');
+
+        while (!terminar) {
+            terminar = true;
+            for (let proceso of procesos) {
+                let cardId = `card-${proceso.id}`;
+                let card = document.getElementById(cardId);
+
+                if (!card) {
+                    card = document.createElement('div');
+                    card.className = 'col-md-4';
+                    card.id = cardId;
+                    card.innerHTML = `
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">Proceso ${proceso.id}</h5>
+                                <p class="card-text" id="card-content-${proceso.id}"></p>
+                            </div>
+                        </div>
+                    `;
+                    cardsRow.appendChild(card);
+                }
+
+                if (proceso.lineaActual < proceso.codigo.length) {
+                    document.getElementById(`card-content-${proceso.id}`).innerText += ejecutarProceso(proceso) + '\n';
+                    terminar = false;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
